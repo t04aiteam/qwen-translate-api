@@ -1,7 +1,10 @@
 fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
-transformers>=4.51.0
-torch>=2.2.0
-accelerate>=0.30.0
-python-dotenv>=1.0.0
+python-multipart>=0.0.9      # multipart/form-data support on /translate and /summarize
 pydantic>=2.0.0
+# GGUF inference. Default wheel is CPU-only; for GPU install with:
+#   CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --force-reinstall --no-cache-dir
+llama-cpp-python>=0.3.0
+# Llama.from_pretrained downloads the checkpoint from the HF Hub
+huggingface_hub>=0.23.0
+python-dotenv>=1.0.0         # used by `uvicorn --env-file`
