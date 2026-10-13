@@ -1,7 +1,7 @@
 """
 Model loader for unsloth/Qwen3.5-4B-GGUF.
-Uses llama-cpp-python to load a GGUF quantised checkpoint directly from
-HuggingFace Hub. The model is loaded once at startup and reused across
+Uses llama-cpp-python to load a GGUF quantised checkpoint resolved through
+the HuggingFace cache (hf_hub_download honours HF_HUB_OFFLINE=1). The model is loaded once at startup and reused across
 all requests.
 
 Environment variables
@@ -14,6 +14,7 @@ N_CTX          Context window size    (default: 8192)
 """
 
 import os
+from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 
 GGUF_REPO  = os.getenv("GGUF_REPO",     "unsloth/Qwen3.5-4B-GGUF")
@@ -38,13 +39,13 @@ def load_model():
     print(f"[loader] Loading {GGUF_FILE} from {GGUF_REPO} ...")
     print(f"[loader] n_gpu_layers={N_GPU_LAYERS}  n_ctx={N_CTX}")
 
-    _llm = Llama.from_pretrained(
-        repo_id=GGUF_REPO,
-        filename=GGUF_FILE,
+    # Llama.from_pretrained lists the repo online first, so it cannot start offline.
+    path = hf_hub_download(repo_id=GGUF_REPO, filename=GGUF_FILE, token=HF_TOKEN)
+    _llm = Llama(
+        model_path=path,
         n_gpu_layers=N_GPU_LAYERS,
         n_ctx=N_CTX,
         verbose=False,
-        token=HF_TOKEN,
     )
     print("[loader] Model ready.")
 

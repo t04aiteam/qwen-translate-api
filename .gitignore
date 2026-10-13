@@ -1,5 +1,6 @@
 # Virtual environments (qwen-env is ~9.9 GB — never commit)
 qwen-env/
+translate_env/
 venv/
 .venv/
 env/
