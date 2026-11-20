@@ -7,12 +7,11 @@ Accepts BOTH:
   - multipart/form-data   → HTML form fields (text, input_language, target_language, ...)
 """
 
-import asyncio
 import os
 import re
 from fastapi import APIRouter, Request
 
-from models.loader import get_llm, MODEL_ID
+from models.loader import get_llm, idle_model, MODEL_ID
 from schemas.request import TranslateRequest, TranslateResponse
 
 router = APIRouter(tags=["Translation"])
@@ -55,8 +54,7 @@ def _run_inference(req: TranslateRequest) -> str:
 
 
 async def _handle_translation(req: TranslateRequest) -> TranslateResponse:
-    loop = asyncio.get_event_loop()
-    translation = await loop.run_in_executor(None, _run_inference, req)
+    translation = await idle_model.run(_run_inference, req)
     return TranslateResponse(
         translation=translation,
         input_language=req.input_language,

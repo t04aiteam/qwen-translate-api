@@ -3,12 +3,11 @@ Summarization route for Qwen3.5-4B.
 Accepts both application/json and multipart/form-data.
 """
 
-import asyncio
 import os
 import re
 from fastapi import APIRouter, Request
 
-from models.loader import get_llm, MODEL_ID
+from models.loader import get_llm, idle_model, MODEL_ID
 from schemas.request import SummarizeRequest, SummarizeResponse
 
 router = APIRouter(tags=["Summarization"])
@@ -59,8 +58,7 @@ def _run_inference(req: SummarizeRequest) -> str:
 
 
 async def _handle_summarization(req: SummarizeRequest) -> SummarizeResponse:
-    loop = asyncio.get_event_loop()
-    summary = await loop.run_in_executor(None, _run_inference, req)
+    summary = await idle_model.run(_run_inference, req)
     return SummarizeResponse(
         summary=summary,
         language=req.language or "English",

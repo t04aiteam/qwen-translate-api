@@ -4,28 +4,21 @@ Endpoints: /translate, /summarize
 """
 
 import os
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from models.loader import load_model, GGUF_FILE
+from models.loader import GGUF_FILE, idle_model
 from routes.translate import router as translate_router
 from routes.summarize import router as summarize_router
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    load_model()
-    yield
 
 
 app = FastAPI(
     title="Qwen3.5-4B NLP API",
     description="Text translation and summarization powered by Qwen/Qwen3.5-4B-GGUF.",
     version="1.1.0",
-    lifespan=lifespan,
+    lifespan=lambda app: idle_model.lifespan(),
 )
 
 app.add_middleware(

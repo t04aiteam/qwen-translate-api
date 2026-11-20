@@ -17,6 +17,8 @@ import os
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 
+from models.idle import IdleModel
+
 GGUF_REPO  = os.getenv("GGUF_REPO",     "unsloth/Qwen3.5-4B-GGUF")
 GGUF_FILE  = os.getenv("GGUF_FILE",     "Qwen3.5-4B-Q4_K_M.gguf")
 HF_TOKEN   = os.getenv("HF_TOKEN",      None)
@@ -48,6 +50,21 @@ def load_model():
         verbose=False,
     )
     print("[loader] Model ready.")
+
+
+def unload_model():
+    global _llm
+    model, _llm = _llm, None
+    if model is not None:
+        model.close()
+
+
+idle_model = IdleModel(
+    load_model,
+    unload_model,
+    int(os.getenv("MODEL_IDLE_SECONDS", "0")),
+    serialize=True,
+)
 
 
 def get_llm() -> Llama:
