@@ -63,7 +63,6 @@ idle_model = IdleModel(
     load_model,
     unload_model,
     int(os.getenv("MODEL_IDLE_SECONDS", "0")),
-    serialize=True,
 )
 
 

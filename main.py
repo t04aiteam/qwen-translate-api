@@ -18,7 +18,7 @@ app = FastAPI(
     title="Qwen3.5-4B NLP API",
     description="Text translation and summarization powered by Qwen/Qwen3.5-4B-GGUF.",
     version="1.1.0",
-    lifespan=lambda app: idle_model.lifespan(),
+    lifespan=lambda app: idle_model.lifespan(preload=True),
 )
 
 app.add_middleware(
